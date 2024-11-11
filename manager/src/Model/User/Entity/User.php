@@ -2,10 +2,12 @@
 
 namespace App\Model\User\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Mailer\Header\TagHeader;
 
 class User
 {
+    private const STATUS_NEW = 'new';
     private const STATUS_WAIT = 'wait';
     private const STATUS_ACTIVE = 'active';
 
@@ -14,16 +16,61 @@ class User
     private string $passwordHash;
     private ?string $confirmToken;
     private string $status;
+    private ?ResetToken $resetToken;
+    private ArrayCollection $networks;
     private \DateTimeImmutable $createdAt;
 
-    public function __construct(Id $id, Email $email, string $passwordHash, string $confirmToken, \DateTimeImmutable $createdAt)
+    public function __construct(Id $id, \DateTimeImmutable $createdAt)
     {
         $this->id = $id;
+        $this->status = self::STATUS_NEW;
+        $this->createdAt = $createdAt;
+        $this->networks = new ArrayCollection();
+    }
+
+    public function signUpByEmail(Email $email, string $passwordHash, string $confirmToken): void
+    {
+        if (!$this->isNew()) {
+            throw new \DomainException('User is already signed up');
+        }
+
         $this->email = $email;
         $this->passwordHash = $passwordHash;
         $this->confirmToken = $confirmToken;
         $this->status = self::STATUS_WAIT;
-        $this->createdAt = $createdAt;
+    }
+
+    public function signUpByNetwork(string $network, string $identify): void
+    {
+        if (!$this->isNew()) {
+            throw new \DomainException('User is already signed up');
+        }
+
+        $this->attachNetwork($network, $identify);
+        $this->status = self::STATUS_ACTIVE;
+    }
+
+    private function attachNetwork(string $network, string $identify): void
+    {
+        foreach ($this->networks as $existing) {
+            if ($existing->isForNetwork($network)) {
+                throw new \DomainException('Network is already attached');
+            }
+        }
+
+        $this->networks->add(new Network($this, $network, $identify));
+    }
+
+    private function requestPasswordReset(ResetToken $token, \DateTimeImmutable $date): void
+    {
+        if (!$this->email) {
+            throw new \DomainException('Email is not specified');
+        }
+        if ($this->resetToken && !$this->resetToken->isExpiredTo($date)) {
+            throw new \DomainException('Resetting is already requested');
+        }
+
+        $this->resetToken = $token;
     }
 
     public function getId(): Id
@@ -51,6 +98,11 @@ class User
         return $this->confirmToken;
     }
 
+    public function isNew(): bool
+    {
+        return $this->status === self::STATUS_NEW;
+    }
+
     public function isWait(): bool
     {
         return $this->status === self::STATUS_WAIT;
@@ -69,5 +121,11 @@ class User
 
         $this->status = self::STATUS_ACTIVE;
         $this->confirmToken = null;
+    }
+
+    // array, а не ArrayCollection, иначе может добавить черзе метод add
+    public function getNetworks(): array
+    {
+        return $this->networks->toArray();
     }
 }

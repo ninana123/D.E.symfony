@@ -6,14 +6,16 @@ use App\Model\User\Entity\Email;
 use App\Model\User\Entity\Id;
 use App\Model\User\Entity\User;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class RequestTest extends TestCase
 {
     public function testSuccess(): void
     {
-        $user = new User($id = Id::next(), $email = new Email('test@mail.ru'), $hash = 'hash', $token = 'token', $createdAt = new \DateTimeImmutable());
+        $user = new User($id = Id::next(), $createdAt = new \DateTimeImmutable());
 
+        self::assertTrue($user->isNew());
+
+        $user->signUpByEmail($email = new Email('test@mail.ru'), $hash = 'hash', $token = 'token');
 
         self::assertTrue($user->isWait());
         self::assertFalse($user->isActive());

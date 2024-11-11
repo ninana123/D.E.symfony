@@ -4,5 +4,5 @@ namespace App\Model;
 
 interface Flusher
 {
-    public function flush();
+    public function flush(): void;
 }

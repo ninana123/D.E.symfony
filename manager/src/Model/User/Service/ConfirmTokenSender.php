@@ -6,5 +6,5 @@ use App\Model\User\Entity\Email;
 
 interface ConfirmTokenSender
 {
-    public function send(Email $email,string $token): void;
+    public function send(Email $email, string $token): void;
 }
