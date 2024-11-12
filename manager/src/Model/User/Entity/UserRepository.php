@@ -12,5 +12,7 @@ interface UserRepository
 
     public function hasByNetworkIdentify(): bool;
 
-    public function getByEmail(): User;
+    public function getByEmail(Email $email): User;
+
+    public function findByResetToken(string $token): User;
 }

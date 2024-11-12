@@ -12,11 +12,11 @@ class User
     private const STATUS_ACTIVE = 'active';
 
     private Id $id;
-    private Email $email;
+    private ?Email $email = null;
     private string $passwordHash;
-    private ?string $confirmToken;
+    private ?string $confirmToken = null;
     private string $status;
-    private ?ResetToken $resetToken;
+    private ?ResetToken $resetToken = null;
     private ArrayCollection $networks;
     private \DateTimeImmutable $createdAt;
 
@@ -61,16 +61,32 @@ class User
         $this->networks->add(new Network($this, $network, $identify));
     }
 
-    private function requestPasswordReset(ResetToken $token, \DateTimeImmutable $date): void
+    public function requestPasswordReset(ResetToken $token, \DateTimeImmutable $date): void
     {
-        if (!$this->email) {
-            throw new \DomainException('Email is not specified');
+        if (!$this->isActive()) {
+            throw new \DomainException('User is not active.');
         }
-        if ($this->resetToken && !$this->resetToken->isExpiredTo($date)) {
-            throw new \DomainException('Resetting is already requested');
+        if (!$this->email) {
+            throw new \DomainException('Email is not specified.');
         }
 
+        if ($this->resetToken && !$this->resetToken->isExpiredTo($date)) {
+            throw new \DomainException('Resetting is already requested.');
+        }
         $this->resetToken = $token;
+    }
+
+    public function passwordReset(\DateTimeImmutable $date, string $passwordHash)
+    {
+        if (!$this->resetToken) {
+            throw new \DomainException('Resetting is not requested.');
+        }
+
+        if ($this->resetToken->isExpiredTo($date)){
+            throw new \DomainException('Reset token is expired.');
+        }
+
+        $this->passwordHash = $passwordHash;
     }
 
     public function getId(): Id
@@ -127,5 +143,10 @@ class User
     public function getNetworks(): array
     {
         return $this->networks->toArray();
+    }
+
+    public function getResetToken(): ?ResetToken
+    {
+        return $this->resetToken;
     }
 }

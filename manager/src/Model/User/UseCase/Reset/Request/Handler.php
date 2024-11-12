@@ -5,27 +5,23 @@ namespace App\Model\User\UseCase\Reset\Request;
 
 use App\Model\Flusher;
 use App\Model\User\Entity\Email;
-use App\Model\User\Entity\Id;
-use App\Model\User\Entity\User;
 use App\Model\User\Entity\UserRepository;
-use App\Model\User\Service\ConfirmTokenizer;
-use App\Model\User\Service\ConfirmTokenSender;
-use App\Model\User\Service\PasswordHasher;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Model\User\Service\ResetTokenizer;
+use App\Model\User\Service\ResetTokenSender;
 
 class Handler
 {
 
     private UserRepository $users;
-    private ConfirmTokenizer $confirmTokenizer;
-    private ConfirmTokenSender $sender;
+    private ResetTokenizer $tokenizer;
+    private ResetTokenSender $sender;
     private Flusher $flusher;
 
-    public function __construct(UserRepository $users, Flusher $flusher, ConfirmTokenizer $confirmTokenizer, ConfirmTokenSender $sender)
+    public function __construct(UserRepository $users, Flusher $flusher, ResetTokenizer $tokenizer, ResetTokenSender $sender)
     {
         $this->users = $users;
         $this->flusher = $flusher;
-        $this->confirmTokenizer = $confirmTokenizer;
+        $this->tokenizer = $tokenizer;
         $this->sender = $sender;
     }
 
@@ -33,7 +29,7 @@ class Handler
     {
         $user = $this->users->getByEmail(new Email($command->email));
 
-        $user->requestPasswordReset($this->confirmTokenizer->generate(), new \DateTimeImmutable());
+        $user->requestPasswordReset($this->tokenizer->generate(), new \DateTimeImmutable());
 
         $this->flusher->flush();
 

@@ -12,7 +12,6 @@ class AuthTest extends TestCase
     public function testSuccess()
     {
         $user = new User(Id::next(), new \DateTimeImmutable());
-
         $user->signUpByNetwork($network = 'vk', $identify = '000001');
 
         self::assertTrue($user->isActive());
