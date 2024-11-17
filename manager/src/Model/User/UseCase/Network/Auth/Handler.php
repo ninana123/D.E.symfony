@@ -4,9 +4,9 @@ namespace App\Model\User\UseCase\Network\Auth;
 
 
 use App\Model\Flusher;
-use App\Model\User\Entity\Id;
-use App\Model\User\Entity\User;
-use App\Model\User\Entity\UserRepository;
+use App\Model\User\Entity\User\Id;
+use App\Model\User\Entity\User\User;
+use App\Model\User\Entity\User\UserRepository;
 
 class Handler
 {

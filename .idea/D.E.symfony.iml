@@ -2,10 +2,9 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/manager/skeleton/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/manager/src" isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/manager/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/manager/tests" isTestSource="true" packagePrefix="App\Tests\" />
-      <sourceFolder url="file://$MODULE_DIR$/manager/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/httpRequests" />
       <excludeFolder url="file://$MODULE_DIR$/manager/skeleton/vendor/composer" />
@@ -237,6 +236,7 @@
       <excludeFolder url="file://$MODULE_DIR$/manager/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/manager/vendor/ramsey/collection" />
       <excludeFolder url="file://$MODULE_DIR$/manager/vendor/ramsey/uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/manager/vendor" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

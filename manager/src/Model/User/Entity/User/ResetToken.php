@@ -1,12 +1,24 @@
 <?php
 
-namespace App\Model\User\Entity;
+namespace App\Model\User\Entity\User;
 
+use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
 
+
+/**
+ * @ORM\Embeddable()
+ */
 class ResetToken
 {
+    /**
+     * @ORM\Column(type="string",nullable=true)
+     */
     private string $token;
+
+    /**
+     * @ORM\Column(type="datetime_immutable",nullable=true)
+     */
     private \DateTimeImmutable $expires;
 
     public function __construct(string $token, \DateTimeImmutable $expires)
@@ -27,4 +39,11 @@ class ResetToken
         return $this->expires <= $date;
     }
 
+    /**
+     * @internal for postLoad callback
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->token);
+    }
 }

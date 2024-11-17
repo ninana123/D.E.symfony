@@ -1,23 +1,68 @@
 <?php
 
-namespace App\Model\User\Entity;
+namespace App\Model\User\Entity\User;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Mailer\Header\TagHeader;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Embedded;
 
+/**
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks
+ * @ORM\Table(name="user_users",uniqueConstraints={
+ *     @ORM\UniqueConstraint(columns={"email"}),
+ *     @ORM\UniqueConstraint(columns={"reset_token_token"})
+ * })
+ */
 class User
 {
     private const STATUS_NEW = 'new';
     private const STATUS_WAIT = 'wait';
     private const STATUS_ACTIVE = 'active';
 
+    /**
+     * @ORM\Column(type="user_user_id")
+     * @ORM\Id()
+     */
     private Id $id;
+
+    /**
+     * @ORM\Column(type="user_user_email",nullable=true)
+     */
     private ?Email $email = null;
-    private string $passwordHash;
+
+    /**
+     * @ORM\Column(type="string",nullable=true)
+     */
+    private ?string $passwordHash = null;
+
+    /**
+     * @ORM\Column(type="string",nullable=true)
+     */
     private ?string $confirmToken = null;
+    /**
+     * @ORM\Column(type="string",length=16)
+     */
     private string $status;
+
+    /**
+     * @ORM\Column(type="user_user_role")
+     */
+    private Role $role;
+
+    /**
+     * @Embedded(class="ResetToken",columnPrefix="reset_token_")
+     */
     private ?ResetToken $resetToken = null;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Network",mappedBy="user",orphanRemoval=true,cascade={"persist"})
+     */
     private ArrayCollection $networks;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private \DateTimeImmutable $createdAt;
 
     public function __construct(Id $id, \DateTimeImmutable $createdAt)
@@ -25,6 +70,7 @@ class User
         $this->id = $id;
         $this->status = self::STATUS_NEW;
         $this->createdAt = $createdAt;
+        $this->role = Role::user();
         $this->networks = new ArrayCollection();
     }
 
@@ -82,11 +128,30 @@ class User
             throw new \DomainException('Resetting is not requested.');
         }
 
-        if ($this->resetToken->isExpiredTo($date)){
+        if ($this->resetToken->isExpiredTo($date)) {
             throw new \DomainException('Reset token is expired.');
         }
 
         $this->passwordHash = $passwordHash;
+    }
+
+    public function confirmSignUp(): void
+    {
+        if (!$this->isWait()) {
+            throw new \DomainException('User is already confirmed.');
+        }
+
+        $this->status = self::STATUS_ACTIVE;
+        $this->confirmToken = null;
+    }
+
+    public function changeRole(Role $role): void
+    {
+        if ($this->role->isEqual($role)) {
+            throw new \DomainException('Role is already same.');
+        }
+
+        $this->role = $role;
     }
 
     public function getId(): Id
@@ -129,16 +194,6 @@ class User
         return $this->status === self::STATUS_ACTIVE;
     }
 
-    public function confirmSignUp(): void
-    {
-        if (!$this->isWait()) {
-            throw new \DomainException('User is already confirmed.');
-        }
-
-        $this->status = self::STATUS_ACTIVE;
-        $this->confirmToken = null;
-    }
-
     // array, а не ArrayCollection, иначе может добавить черзе метод add
     public function getNetworks(): array
     {
@@ -147,6 +202,27 @@ class User
 
     public function getResetToken(): ?ResetToken
     {
+
         return $this->resetToken;
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(Role $role): void
+    {
+        $this->role = $role;
+    }
+
+    /**
+     * @ORM\PostLoad()
+     */
+    public function checkEmbeds(): void
+    {
+        if ($this->resetToken->isEmpty()) {
+            $this->resetToken = null;
+        }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Tests\Builder\User;
 
-use App\Model\User\Entity\Email;
-use App\Model\User\Entity\Id;
-use App\Model\User\Entity\User;
+use App\Model\User\Entity\User\Email;
+use App\Model\User\Entity\User\Id;
+use App\Model\User\Entity\User\User;
 
 class UserBuilder
 {

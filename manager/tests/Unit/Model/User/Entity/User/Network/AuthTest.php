@@ -2,9 +2,9 @@
 
 namespace App\Tests\Unit\Model\User\Entity\User\Network;
 
-use App\Model\User\Entity\Id;
-use App\Model\User\Entity\Network;
-use App\Model\User\Entity\User;
+use App\Model\User\Entity\User\Id;
+use App\Model\User\Entity\User\Network;
+use App\Model\User\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 
 class AuthTest extends TestCase
@@ -12,14 +12,16 @@ class AuthTest extends TestCase
     public function testSuccess()
     {
         $user = new User(Id::next(), new \DateTimeImmutable());
-        $user->signUpByNetwork($network = 'vk', $identify = '000001');
+        $user->signUpByNetwork($network = 'vk', $identity = '000001');
 
         self::assertTrue($user->isActive());
 
         self::assertCount(1, $networks = $user->getNetworks());
         self::assertInstanceOf(Network::class, $first = reset($networks));
         self::assertEquals($network, $first->getNetWork());
-        self::assertEquals($identify, $first->getIdentify());
+        self::assertEquals($identity, $first->getIdentity());
+
+        self::assertTrue($user->getRole()->isUser());
     }
 
     public function testAlready()

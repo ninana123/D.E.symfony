@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\User\Entity;
+namespace App\Model\User\Entity\User;
 
 use Ramsey\Uuid\Uuid;
 
@@ -23,4 +23,8 @@ class Id
         return $this->value;
     }
 
+    public function __toString():string
+    {
+        return $this->value;
+    }
 }

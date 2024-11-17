@@ -2,7 +2,7 @@
 
 namespace App\Model\User\Service;
 
-use App\Model\User\Entity\ResetToken;
+use App\Model\User\Entity\User\ResetToken;
 use Ramsey\Uuid\Uuid;
 
 class ResetTokenizer

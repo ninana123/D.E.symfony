@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\User\Entity;
+namespace App\Model\User\Entity\User;
 
 class Email
 {

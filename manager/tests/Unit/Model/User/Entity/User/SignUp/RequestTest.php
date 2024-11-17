@@ -2,9 +2,9 @@
 
 namespace App\Tests\Unit\Model\User\Entity\User\SignUp;
 
-use App\Model\User\Entity\Email;
-use App\Model\User\Entity\Id;
-use App\Model\User\Entity\User;
+use App\Model\User\Entity\User\Email;
+use App\Model\User\Entity\User\Id;
+use App\Model\User\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase
@@ -25,6 +25,8 @@ class RequestTest extends TestCase
         self::assertEquals($hash, $user->getPasswordHash());
         self::assertEquals($token, $user->getConfirmToken());
         self::assertEquals($createdAt, $user->getCreatedAt());
+
+        self::assertTrue($user->getRole()->isUser());
     }
 
 }
