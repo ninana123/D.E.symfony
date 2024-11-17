@@ -2,7 +2,9 @@
 
 namespace App\Model\User\Entity\User;
 
+
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Embedded;
 
@@ -58,7 +60,7 @@ class User
     /**
      * @ORM\OneToMany(targetEntity="Network",mappedBy="user",orphanRemoval=true,cascade={"persist"})
      */
-    private ArrayCollection $networks;
+    private Collection $networks;
 
     /**
      * @ORM\Column(type="datetime_immutable")
