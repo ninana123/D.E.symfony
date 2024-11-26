@@ -2,7 +2,7 @@
 
 namespace App\Model\User\UseCase\Reset\Reset;
 
-use App\Model\User\UseCase\SignUp\Confirm\Command;
+use App\Model\User\UseCase\Reset\Reset\Command;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
